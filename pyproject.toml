@@ -42,10 +42,6 @@ build-backend = "setuptools.build_meta"
 where = ["MarchingNumPy"]
 include = ["MarchingNumPy*"]
 
-[options.packages.find]
-where = ["MarchingNumPy"]
-include = ["MarchingNumPy*"]
-
 [tool.mypy]
 
 [tool.ruff]
