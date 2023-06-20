@@ -68,49 +68,27 @@ The calculation of intersects is the same but now in 2D along two axes rather th
 The marching squares have 4 vertices that gives :math:`2^4 = 1\newcommand*\ShiftLeft{\ll}4 = 16`
 possible types that are reduced to 7 by symmetry.
 It is trivial to draw up the look-up table by hand.
-# Ambiguity.
-
 
 Marching Triangles is an exercise where the squares are split into triangles along their diagonals.
-Triangles can be split in eother of two directions / or \\.
-This gives someThis results in a system with no ambiguity.
-
-
-
-Dual Contouring
----------------
-This package includes an implementation of the Dual Contouring algorithm using numpy: :func:`dual_contouring`.
-
-`Dual Contouring` is an alternative approach to calculating an isosurface.
-The approach is similar to `Marching Cubes` but instead of constructing a 
-mesh joining the crossing points along the axes; it constructs a mesh 
-between the centre of each volume `unit`. 
-For each time that the volume value crosses the `level` threshold along each axis,
-interpolate the position of the intersection - this becomes a `vertex` for the output mesh. 
+Triangles can be split in either of two directions / or \\.
+This approach results in a system with no ambiguity.
 
 
 Marching NumPy
 --------------
 The importance of calculating isosurfaces this was means there are multiple implementations
-of the marching cubes algorithm.
-Furthermore, the marching cubes algorithm is a common teaching tool in computer science. 
+of the marching cubes algorithm. 
+Additionally, the marching cubes algorithm is a common teaching tool in computer science. 
 
-Within python, marching cubes is available from multiple sources. `[PiPy marching cubes] <https://pypi.org/search/?q="marching+cubes">`_
+   - The scikit-image package includes :func:`skimage.measure.marching_cubes` `[API] <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.marching_cubes>`_
+   - Within python, marching cubes is available from multiple sources: `[PiPy "marching cubes"] <https://pypi.org/search/?q="marching+cubes">`_
 
-within the scikit-image package as :func:`skimage.measure.marching-cubes`
-`API <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.marching_cubes>`_
-`Description and example <https://scikit-image.org/docs/stable/auto_examples/edges/plot_marching_cubes.html>`_
-
-   -scikit-image
-   -random person
-   -random person2
 
 NumPy is a powerful package for manipulating data in python that is used widely for scientific computing and data analysis.
-NumPy provides a very efficient way to store arrayed data and a suite of functions to process the data. 
-If NumPy functions are exploited correctly then calculations can be signficantly accelerated by exploting the underlying C, C++, and Fortran code.
+NumPy provides a very efficient way to store arrayed data and a suite of methods to process that data. 
+If NumPy methods are exploited correctly then calculations can be signficantly accelerated by exploting the underlying lower level functions.
+This package uses only NumPy methods to acheive "very fast" marching cubes. 
 
-
-I found myself in a situation where NumPy was readily available but other approaches were not. 
 
 
 References and Notes
