@@ -61,7 +61,7 @@ Marching Cubes in 2D: Marching Squares and Marching Triangles
 -------------------------------------------------------------
 This package includes an implementation of the Marching Squares and Marching Triangles algorithms 
 using numpy: :meth:`MarchingSquares.marching_squares` and
-:meth:`MarchignTriangles.marching_triangles` / :meth:`MarchignTriangles.marching_triangles_reversed`.
+:meth:`MarchingTriangles.marching_triangles` / :meth:`MarchingTriangles.marching_triangles_reversed`.
 
 The same logic can be applied 2-dimensionally to find `isolines` or `contours` for 2D values.
 The calculation of intersects is the same but now in 2D along two axes rather than 3D. 

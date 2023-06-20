@@ -1,50 +1,50 @@
 
-MarchingNumpy
+MarchingNumPy
 =============
 
-.. automodule:: MarchingNumpy.MarchingNumpy.MarchingCubesLorensen
+.. automodule:: MarchingNumPy.MarchingNumPy.MarchingCubesLorensen
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.MarchingSquares
+.. automodule:: MarchingNumPy.MarchingNumPy.MarchingSquares
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.MarchingTriangles
+.. automodule:: MarchingNumPy.MarchingNumPy.MarchingTriangles
    :members:
 
 
-MarchingNumpy Algorithmic Steps
+MarchingNumPy Algorithmic Steps
 ===============================
 
-.. automodule:: MarchingNumpy.MarchingNumpy.Marching
+.. automodule:: MarchingNumPy.MarchingNumPy.Marching
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.FindIntersects
+.. automodule:: MarchingNumPy.MarchingNumPy.FindIntersects
    :members: find_intersects
 
-.. automodule:: MarchingNumpy.MarchingNumpy.VolumeTypes
+.. automodule:: MarchingNumPy.MarchingNumPy.VolumeTypes
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.ResolveAmbiguous
+.. automodule:: MarchingNumPy.MarchingNumPy.ResolveAmbiguous
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.LookUpGeometry
+.. automodule:: MarchingNumPy.MarchingNumPy.LookUpGeometry
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.ConvertIndexes
+.. automodule:: MarchingNumPy.MarchingNumPy.ConvertIndexes
    :members: convert_indexes
    
 
 General Tools
 =============
 
-.. automodule:: MarchingNumpy.MarchingNumpy.FindIntersects
+.. automodule:: MarchingNumPy.MarchingNumPy.FindIntersects
    :members: vector_from_slices
 
-.. automodule:: MarchingNumpy.MarchingNumpy.ConvertIndexes
+.. automodule:: MarchingNumPy.MarchingNumPy.ConvertIndexes
    :members: ndarray_dict_lookup, ndarray_dict_ordered_lookup, ndarray_numpy_ordered_lookup
 
-.. automodule:: MarchingNumpy.MarchingNumpy.Checking
+.. automodule:: MarchingNumPy.MarchingNumPy.Checking
    :members:
 
-.. automodule:: MarchingNumpy.MarchingNumpy.IndexingTools
+.. automodule:: MarchingNumPy.MarchingNumPy.IndexingTools
    :members:

@@ -6,7 +6,7 @@ readme = "README.rst"
 requires-python = ">=3.6"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Alistair Boyer", email = "MarchingNumpy@boyer-research.com"},
+    {name = "Alistair Boyer", email = "MarchingNumPy@boyer-research.com"},
 ]
 keywords = [
   "Marching Cubes",
@@ -39,7 +39,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["MarchingNumpy"]
+where = ["MarchingNumPy"]
 
 [tool.mypy]
 

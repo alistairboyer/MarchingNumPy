@@ -14,12 +14,12 @@ import os
 import sys
 import sphinx_rtd_theme
 
-
+sys.path.insert(0, os.path.abspath("../../../MarchingNumPy"))
 sys.path.insert(0, os.path.abspath("../../../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "MarchingNumpy"
+project = "MarchingNumPy"
 copyright = "2023, Alistair Boyer"
 author = "Alistair Boyer"
 
