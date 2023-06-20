@@ -13,4 +13,4 @@ sphinx:
 python:
    install:
      - method: pip
-       path: ./MarchingNumPy
+       path: MarchingNumPy
