@@ -1,0 +1,47 @@
+[project]
+name = "MarchingNumPy"
+version = "0.9.0"
+description = "Create an isosurface from 3D volume data, or isolines from 2D volume data using the marching cubes, squares or triangles algorithms. An implementation in pure Python and NumPy."
+readme = "README.rst"
+requires-python = ">=3.6"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Alistair Boyer", email = "MarchingNumpy@boyer-research.com"},
+]
+keywords = [
+  "Marching Cubes",
+  "Lorensen",
+  "Marching Squares",
+  "Marching Triangles",
+  "NumPy",
+  "isosurface",
+  "isolines",
+  "meshing",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Multimedia :: Graphics :: 3D Rendering",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+  "numpy > 1.17",
+]
+
+[project.urls]
+
+[project.scripts]
+
+[project.optional-dependencies]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["MarchingNumpy"]
+
+[tool.mypy]
+
+[tool.ruff]
+line-length = 120
