@@ -1,5 +1,5 @@
 
-MarchingNumpy
+MarchingNumPy
 =============
 
 This package is a Python and NumPy implementation of the marching cubes and realted algorithms.
