@@ -1,14 +1,14 @@
 MarchingNumPy
 =============
 
-This package is a Python and NumPy implementation of the marching cubes and realted algorithms.
+This package is a Python and NumPy implementation of the marching cubes and related algorithms.
 
 .. include:: Background.rst
 
 .. include:: Marching.rst
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
 
 Indices and tables

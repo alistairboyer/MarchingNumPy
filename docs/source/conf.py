@@ -14,7 +14,8 @@ import os
 import sys
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath("../../"))
+sys.path.insert(0, os.path.abspath("../../.."))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -43,7 +44,7 @@ templates_path = ["_templates"]
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-add_module_names = False
+add_module_names = True
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
