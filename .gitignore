@@ -4,6 +4,9 @@ backup/
 development/
 videos/*
 !videos/Video01/
+CuPyConvert.py
+MarchingCuPy
+MarchingCuPy/*
 
 # Editors
 .vscode/

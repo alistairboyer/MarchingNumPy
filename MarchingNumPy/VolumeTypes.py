@@ -125,11 +125,19 @@ def volume_types(
 
         # update the types with a bitwise_or according to
         # the index i of this slice
+        # CUPYIGNORE
+
         numpy.bitwise_or(
             types,
             1 << i,
             out=types,
             where=volume_test[slice_i],
         )
+
+        # CUPYIGNOREEND
+        # slower alternative that is compatible with cupy
+        # CUPYINCLUDE
+        # types[volume_test[slice_i]] |= 1 << i
+        # CUPYINCLUDEEND
 
     return types

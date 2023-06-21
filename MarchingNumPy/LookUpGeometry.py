@@ -91,7 +91,7 @@ def look_up_geometry(
 
         # get the corner coordinates from the filter tuple
         # duplicate the corners for each vertex in the set
-        corners = numpy.asarray([numpy.transpose(geometry_lookups_filter)] * nV)
+        corners = numpy.asarray([numpy.asarray(geometry_lookups_filter).transpose()] * nV)
 
         # fetch the set of nV edge numbers from the geometry information
         geometry_type_column = geometry_lookups[geometry_lookups_filter][
