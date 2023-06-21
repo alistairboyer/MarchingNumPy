@@ -2,49 +2,49 @@
 MarchingNumPy
 =============
 
-.. automodule:: MarchingNumPy.MarchingNumPy.MarchingCubesLorensen
+.. automodule:: MarchingNumPy.MarchingCubesLorensen
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.MarchingSquares
+.. automodule:: MarchingNumPy.MarchingSquares
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.MarchingTriangles
+.. automodule:: MarchingNumPy.MarchingTriangles
    :members:
 
 
 MarchingNumPy Algorithmic Steps
 ===============================
 
-.. automodule:: MarchingNumPy.MarchingNumPy.Marching
+.. automodule:: MarchingNumPy.Marching
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.FindIntersects
+.. automodule:: MarchingNumPy.FindIntersects
    :members: find_intersects
 
-.. automodule:: MarchingNumPy.MarchingNumPy.VolumeTypes
+.. automodule:: MarchingNumPy.VolumeTypes
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.ResolveAmbiguous
+.. automodule:: MarchingNumPy.ResolveAmbiguous
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.LookUpGeometry
+.. automodule:: MarchingNumPy.LookUpGeometry
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.ConvertIndexes
+.. automodule:: MarchingNumPy.ConvertIndexes
    :members: convert_indexes
    
 
 General Tools
 =============
 
-.. automodule:: MarchingNumPy.MarchingNumPy.FindIntersects
+.. automodule:: MarchingNumPy.FindIntersects
    :members: vector_from_slices
 
-.. automodule:: MarchingNumPy.MarchingNumPy.ConvertIndexes
+.. automodule:: MarchingNumPy.ConvertIndexes
    :members: ndarray_dict_lookup, ndarray_dict_ordered_lookup, ndarray_numpy_ordered_lookup
 
-.. automodule:: MarchingNumPy.MarchingNumPy.Checking
+.. automodule:: MarchingNumPy.Checking
    :members:
 
-.. automodule:: MarchingNumPy.MarchingNumPy.IndexingTools
+.. automodule:: MarchingNumPy.IndexingTools
    :members:
