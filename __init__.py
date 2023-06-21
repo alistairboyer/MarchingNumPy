@@ -1,4 +1,0 @@
-from .MarchingNumPy.MarchingCubesLorensen import marching_cubes_lorensen
-from .MarchingNumPy.MarchingSquares import marching_squares
-from .MarchingNumPy.MarchingTriangles import marching_triangles
-from .MarchingNumPy.MarchingTriangles import marching_triangles_reversed
