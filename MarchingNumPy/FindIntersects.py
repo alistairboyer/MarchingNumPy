@@ -219,9 +219,16 @@ def find_intersects(
         intersects = numpy.concatenate((intersects, intersects_along_axis), axis=0)
         # convert the intersect_indices into intersect_ids and append to list
         intersect_ids = numpy.concatenate(
+#            (intersect_ids, numpy.einsum('...i->...',intersect_indices * size_multiplier) + i),
             (intersect_ids, (intersect_indices * size_multiplier).sum(axis=1) + i),
+#            (intersect_ids, numpy.dot(intersect_indices, size_multiplier) + i),
             axis=0,
         )
+        
+
+        # einsum is faster than equivalent .sum(axis=1)
+        # but einsum is harder to read / maybe skips some checking
+        # multiply and .sum is faster than numpy.dot
 
     return intersects, intersect_ids
 

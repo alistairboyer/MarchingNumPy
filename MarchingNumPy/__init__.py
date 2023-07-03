@@ -8,7 +8,6 @@ marching_triangles = MarchingTriangles.marching_triangles
 marching_triangles_reversed = MarchingTriangles.marching_triangles_reversed
 
 __all__ = [
-    "MarchingNumPy",
     "MarchingCubesLorensen",
     "MarchingSquares",
     "MarchingTriangles",

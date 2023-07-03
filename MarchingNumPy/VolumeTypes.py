@@ -117,6 +117,10 @@ def volume_types(
             f"The largest index {(1<<nDir)-1} will not fit into numpy.ndarray with dtype={dtype.__name__}."
         )
 
+    # Cool but much slower approach
+    # numpy.lib.stride_tricks.sliding_window_view(volume_test, [2] * nD)
+    # then numpy.packbits ... 
+
     # iterate over the slices
     # the order determines the bit shift, i, of the resulting test
     i: int
