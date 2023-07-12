@@ -5,8 +5,6 @@ development/
 videos/*
 !videos/Video01/
 CuPyConvert.py
-MarchingCuPy
-MarchingCuPy/*
 quicktest.py
 
 # Editors
