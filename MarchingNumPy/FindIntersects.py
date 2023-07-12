@@ -24,8 +24,8 @@ def find_intersects(
     Each intersect where the **volume** crosses the **level**
     is recorded in the **intersects** NDArray.
     Each intersect has an associated unique id that
-    is recorded in the **intersect_ids** NDArray.   
-     
+    is recorded in the **intersect_ids** NDArray.
+
     The **level** is used to generate a
     zero-referenced volume and volume_test as below.
     If **level** is non-truthy (i.e. `0.0` or `None`) then
@@ -36,7 +36,7 @@ def find_intersects(
 
         volume = volume - level
         volume_test = volume >= 0
-           
+
     The crossing point is calculated according to value of **interpolation**:
 
     "HALFWAY"
@@ -85,7 +85,7 @@ def find_intersects(
 
     size_multiplier : NDArray[Any]
         A multiplier to convert a coordinate and direction into a unique id.
-        
+
     volume_test : NDArray[numpy.bool\_], default = None
         Optional bool-like results of the results of testing the volume against the :attr:`level`.
         The size must match the size of :attr:`volume`.
@@ -196,20 +196,22 @@ def find_intersects(
                     / numpy.pi
                 ).astype(Intersect)
 
-        # caluclate a vector based upon the slice directions
+        # calculate a vector based upon the slice directions
         slice_vector: NDArray[numpy.integer[Any]]
         slice_vector = numpy.absolute(vector_from_slices(n_slices, nplus1_slices))
 
         # fill out the interpolated value
         # double transpose for broadcasting!
         interpolated_offset = (
-            numpy.full(
+            interpolated_offset
+            * numpy.full(
                 intersect_indices.shape,
                 slice_vector,
                 dtype=Intersect,
             ).transpose()
-            * interpolated_offset
         ).transpose()
+        # numpy.einsum is tidier but a little slower and horroble for cupy
+        # numpy.einsum("i,j->ij", interpolated_offset, slice_vector)
 
         # add the appropriate amount according to interpolation
         intersects_along_axis += interpolated_offset
@@ -217,17 +219,23 @@ def find_intersects(
         # add any results to the complete list
         # extend the list of intersects with the ones from this axis
         intersects = numpy.concatenate((intersects, intersects_along_axis), axis=0)
+
         # convert the intersect_indices into intersect_ids and append to list
         intersect_ids = numpy.concatenate(
-#            (intersect_ids, numpy.einsum('...i->...',intersect_indices * size_multiplier) + i),
-            (intersect_ids, (intersect_indices * size_multiplier).sum(axis=1) + i),
-#            (intersect_ids, numpy.dot(intersect_indices, size_multiplier) + i),
+            # CUPYIGNORE
+            (
+                intersect_ids,
+                numpy.einsum("ij,j->i", intersect_indices, size_multiplier) + i,
+            ),
+            # CUPYIGNOREEND
+            # CUPYINCLUDE
+            # (intersect_ids, (intersect_indices * size_multiplier).sum(axis=1) + i),
+            # CUPYINCLUDEEND
+            # (intersect_ids, numpy.dot(intersect_indices, size_multiplier) + i),
             axis=0,
         )
-        
 
         # einsum is faster than equivalent .sum(axis=1)
-        # but einsum is harder to read / maybe skips some checking
         # multiply and .sum is faster than numpy.dot
 
     return intersects, intersect_ids
@@ -238,7 +246,7 @@ def vector_from_slices(
     to_slices: Collection[slice],
 ):
     """
-    Calculates a direction vector based 
+    Calculates a direction vector based
     upon two Collections of slices.
 
     Args:

@@ -4,15 +4,6 @@ from numpy.typing import NDArray
 
 import numpy
 
-SQUARE_AMBIGUITY_RESOLUTION = {
-    5: [
-        [False, True, 16],
-    ],
-    10: [
-        [True, True, 17],
-    ],
-}
-
 
 def resolve_ambiguous_types(
     types: NDArray[numpy.integer[Any]],
@@ -26,7 +17,7 @@ def resolve_ambiguous_types(
     :attr:`ambiguity_resolution` is a ``dict`` that has the
     type from a corner value lookup as keys.
     The values are a list: [`test_values`, `test_selection`, `resolved_type`]
-    where the `test_values` wil be checked against the 
+    where the `test_values` wil be checked against the
     :attr:`interpolated_face_values` and if they match,
     filtered by where the `test_selection` pattern is True,
     then the type is updated to be `resolved_type`.
@@ -56,6 +47,7 @@ def resolve_ambiguous_types(
         new_values = numpy.full_like(types[filter], ambiguous_type)
 
         for [test_values, test_selection, resolved_type] in resolutions:
+            #types[filter][interpolated_face_values[filter].flatten()] = resolved_type
             numpy.place(
                 new_values,
                 (interpolated_face_values[filter] == test_values).all(
@@ -63,5 +55,4 @@ def resolve_ambiguous_types(
                 ),
                 resolved_type,
             )
-
         types[filter] = new_values

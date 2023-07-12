@@ -366,7 +366,6 @@ marching_cubes_lorensen = Marching.marching_factory(
     intersect_slice_indexes=INTERSECT_SLICE_INDEXES,
     volume_type_slices=VOLUME_TYPE_SLICES,
     ambiguity_resolution=None,
-    ambiguity_interpolater=None,
     geometry_array=GEOMETRY_LOOKUP,
     edge_direction=EDGE_DIRECTION,
     edge_delta=EDGE_DELTA,

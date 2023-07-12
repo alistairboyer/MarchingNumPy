@@ -7,6 +7,7 @@ videos/*
 CuPyConvert.py
 MarchingCuPy
 MarchingCuPy/*
+quicktest.py
 
 # Editors
 .vscode/

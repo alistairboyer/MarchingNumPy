@@ -119,7 +119,7 @@ def volume_types(
 
     # Cool but much slower approach
     # numpy.lib.stride_tricks.sliding_window_view(volume_test, [2] * nD)
-    # then numpy.packbits ... 
+    # then numpy.packbits ...
 
     # iterate over the slices
     # the order determines the bit shift, i, of the resulting test

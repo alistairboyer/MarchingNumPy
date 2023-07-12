@@ -7,7 +7,6 @@ import numpy
 from . import Checking
 from . import FindIntersects
 from . import VolumeTypes
-from . import ResolveAmbiguous
 from . import LookUpGeometry
 from . import ConvertIndexes
 from . import Types
@@ -19,8 +18,9 @@ def marching_factory(
     nEdges: int,
     intersect_slice_indexes: Collection[Any],
     volume_type_slices: Collection[Tuple[slice, ...]],
-    ambiguity_resolution: Optional[Dict[int, Any]] = None,
-    ambiguity_interpolater: Optional[Callable[..., NDArray[numpy.bool_]]] = None,
+    ambiguity_resolution: Optional[
+        Callable[[NDArray[Any], NDArray[Any]], NDArray["numpy.bool_"]]
+    ] = None,
     geometry_array: NDArray[numpy.integer[Any]],
     edge_direction: NDArray[numpy.unsignedinteger[Any]],
     edge_delta: NDArray[numpy.unsignedinteger[Any]],
@@ -41,11 +41,8 @@ def marching_factory(
             Edge ID direction for :func:`.LookUpGeometry.look_up_geometry`.
         edge_id_delta (NDArray[numpy.unsignedinteger[Any]]):
             Edge ID delta for :func:`.LookUpGeometry.look_up_geometry`.
-        ambiguity_resolution (Optional[Dict[int, Any]], optional):
-            Dictionary of ambiguity resolution for :func:`.ResolveAmbiguous.resolve_ambiguous_types`.
-            Defaults to None.
-        ambiguity_interpolater (Optional[Callable[..., NDArray[numpy.bool\_]]], optional):
-            Callable function to return values for :func:`.ResolveAmbiguous.resolve_ambiguous_types`.
+        ambiguity_reaolution (Optional[Callable[[NDArray, NDArray], NDArray["bool"]]]):
+            Callable function to modify types in ambiguous sitiations.
             Defaults to None.
     """
 
@@ -159,12 +156,8 @@ def marching_factory(
         )
 
         # resolve ambiguous cases
-        if resolve_ambiguous and ambiguity_resolution and ambiguity_interpolater:
-            ResolveAmbiguous.resolve_ambiguous_types(
-                types=types,
-                interpolated_face_values=ambiguity_interpolater(volume),
-                ambiguity_resolution=ambiguity_resolution,
-            )
+        if resolve_ambiguous and ambiguity_resolution:
+            ambiguity_resolution(types=types, volume=volume)
 
         # look up geometry according to square type
         geometry: NDArray[numpy.integer]

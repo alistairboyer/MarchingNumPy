@@ -6,7 +6,7 @@ import numpy
 
 from . import Marching
 from . import IndexingTools
-
+from . import ResolveAmbiguous
 
 marching_squares: Callable  # See end of file
 """
@@ -131,17 +131,35 @@ SQUARE_AMBIGUITY_RESOLUTION = {
 }
 
 
-def interpolate_face_values(
-    volume: NDArray[Any],
-) -> NDArray[numpy.bool_]:
-    # TODO only calculate this where appropriate instead of over entire volume
-    n: int
-    values: NDArray[numpy.bool_]
-    values = numpy.zeros((*[n - 1 for n in volume.shape], 1), dtype=numpy.bool_)
-    values[..., 0] = (
-        volume[:-1, :-1] * volume[1:, 1:] < volume[:-1, 1:] * volume[1:, :-1]
+def ambiguity_resolution(
+    types,
+    volume,
+):
+    ResolveAmbiguous.resolve_ambiguous_types(
+        types,
+        interpolate_face_values(volume)[..., None],
+        SQUARE_AMBIGUITY_RESOLUTION,
     )
-    return values
+
+
+def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.bool_]:
+    return (
+        volume[:-1, :-1][filt] * volume[1:, 1:][filt]
+        < volume[:-1, 1:][filt] * volume[1:, :-1][filt]
+    )
+
+
+def ambiguity_resolution2(
+    types,
+    volume,
+):
+    for ambiguous_type, condition, resolved_type in [
+        (5, False, 16),
+        (10, True, 17),
+    ]:
+        filt = numpy.nonzero(types == ambiguous_type)
+        face_test = interpolate_face_values(volume, filt)
+        types[filt][face_test == condition] = resolved_type
 
 
 marching_squares = Marching.marching_factory(
@@ -149,8 +167,7 @@ marching_squares = Marching.marching_factory(
     nEdges=2,
     intersect_slice_indexes=INTERSECT_SLICE_INDEXES,
     volume_type_slices=VOLUME_TYPE_SLICES,
-    ambiguity_resolution=SQUARE_AMBIGUITY_RESOLUTION,
-    ambiguity_interpolater=interpolate_face_values,
+    ambiguity_resolution=ambiguity_resolution,
     geometry_array=GEOMETRY_LOOKUP,
     edge_direction=EDGE_DIRECTION,
     edge_delta=EDGE_DELTA,

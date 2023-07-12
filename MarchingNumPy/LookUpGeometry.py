@@ -18,8 +18,9 @@ def look_up_geometry(
 
     The value in :attr:`types` is used to lookup sets of `edge number` from :attr:`geometry_array`.
     The `edge number` information is used to lookup values in :attr:`edge_direction` and :attr:`edge_delta`.
-    The current location is added to the :attr:`edge_delta` then multiplied by
-    the :attr:`size_multiplier` and added to :attr:`edge_direction` to calculate the `vertex_id`.
+    This can be reduced to an array of vertex_id_offsets once the size_multiplier is known.
+    The current location is dot with the :attr:`size_multiplier` and added to :attr:`vertex_id_offsets`
+    to calculate the `vertex_id`.
     The combined `vertex_ids` make up the geometry.
 
 
@@ -78,37 +79,46 @@ def look_up_geometry(
     geometry_lookups: NDArray[numpy.integer[Any]]
     geometry_lookups = geometry_array[types]
 
+    # The edge information in EDGE_DELTA and EDGE_DIRECTION
+    # Can be reduced to a single array once size_multiplier is known
+    # vertex_id_offset_lookup = numpy.dot(edge_delta, size_multiplier) + edge_direction
+    vertex_id_offset_lookup = (edge_delta * size_multiplier).sum(
+        axis=-1
+    ) + edge_direction
+
     # consider each set of vertices from the look up table
     i: int
-
     for i in range(0, geometry_array.shape[-1], nV):
 
         # filter the geometry indexes for -1 [null / no geometry]
         geometry_lookups_filter = numpy.nonzero(geometry_lookups[..., i] != -1)
+
         # if there are no nore matches then there are no more geometry to be found
         if geometry_lookups_filter[0].size == 0:
             break
-
-        # get the corner coordinates from the filter tuple
-        # duplicate the corners for each vertex in the set
-        corners = numpy.asarray([numpy.asarray(geometry_lookups_filter).transpose()] * nV)
 
         # fetch the set of nV edge numbers from the geometry information
         geometry_type_column = geometry_lookups[geometry_lookups_filter][
             ..., i : i + nV
         ].astype(numpy.int16)
 
-        # calculate the vertex_ids from the edge numbers
-        # need to juggle the axes
+        # get the corner coordinates from the filter tuple
+        # convert to corner_ids by taking dot product with size_multiplier
+        # CUPYIGNORE
+        corner_ids = numpy.einsum(
+            "ij,i",
+            numpy.asarray(geometry_lookups_filter, dtype="uint64"),
+            size_multiplier,
+        )
+        # CUPYIGNOREEND
+        # CUPYINCLUDE
+        # corner_ids = (numpy.asarray(geometry_lookups_filter, dtype="uint64").transpose() * size_multiplier).sum(axis=-1)
+        # CUPYINCLUDEEND
+
+        # add the corner_ids to the looked up vertex_id_offset to get the vertex ids
         geometry_vertex_ids = (
-            (
-                size_multiplier
-                * (numpy.moveaxis(edge_delta[geometry_type_column], 0, 1) + corners)
-            )
-            .sum(axis=-1)
-            .transpose()
-        ) + edge_direction[geometry_type_column]
-        geometry_vertex_ids = geometry_vertex_ids.astype(numpy.uint64)
+            corner_ids[..., None] + vertex_id_offset_lookup[geometry_type_column]
+        )
 
         # extend the geometry by the current vertex_ids
         geometry = numpy.concatenate((geometry, geometry_vertex_ids), axis=0)
