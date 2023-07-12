@@ -6,7 +6,6 @@ import numpy
 
 from . import Marching
 from . import IndexingTools
-from . import ResolveAmbiguous
 
 marching_squares: Callable  # See end of file
 """
@@ -54,7 +53,6 @@ INTERSECT_SLICE_INDEXES = [
     IndexingTools.str_to_index_tuple("[:-1, :]", "[1:, :]"),  # x,y - x+1,y
     IndexingTools.str_to_index_tuple("[:, :-1]", "[:, 1:]"),  # x,y - x,y+1
 ]
-
 
 EDGE_DELTA: NDArray[numpy.uint8]
 EDGE_DELTA = numpy.asarray(
@@ -131,17 +129,6 @@ SQUARE_AMBIGUITY_RESOLUTION = {
 }
 
 
-def ambiguity_resolution(
-    types,
-    volume,
-):
-    ResolveAmbiguous.resolve_ambiguous_types(
-        types,
-        interpolate_face_values(volume)[..., None],
-        SQUARE_AMBIGUITY_RESOLUTION,
-    )
-
-
 def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.bool_]:
     return (
         volume[:-1, :-1][filt] * volume[1:, 1:][filt]
@@ -149,10 +136,10 @@ def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.boo
     )
 
 
-def ambiguity_resolution2(
+def ambiguity_resolution(
     types,
     volume,
-):
+) -> None:
     for ambiguous_type, condition, resolved_type in [
         (5, False, 16),
         (10, True, 17),

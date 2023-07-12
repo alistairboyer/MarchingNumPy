@@ -148,10 +148,7 @@ def find_intersects(
         # compare each volume_test value with the next value along the vector
         value_filter: Tuple[NDArray[numpy.int64], ...]  # Type from numpy.nonzero
         value_filter = numpy.nonzero(
-            numpy.logical_xor(
-                volume_test[n_slices],
-                volume_test[nplus1_slices],
-            )
+            volume_test[n_slices] != volume_test[nplus1_slices]
         )
 
         # convert the filter into indices where there are crossing points
@@ -198,14 +195,14 @@ def find_intersects(
 
         # calculate a vector based upon the slice directions
         slice_vector: NDArray[numpy.integer[Any]]
-        slice_vector = numpy.absolute(vector_from_slices(n_slices, nplus1_slices))
+        slice_vector = vector_from_slices(n_slices, nplus1_slices, absolute=True)
 
         # fill out the interpolated value
         # double transpose for broadcasting!
         interpolated_offset = (
             interpolated_offset
-            * numpy.full(
-                intersect_indices.shape,
+            * numpy.full_like(
+                intersect_indices,
                 slice_vector,
                 dtype=Intersect,
             ).transpose()
@@ -244,6 +241,7 @@ def find_intersects(
 def vector_from_slices(
     from_slices: Collection[slice],
     to_slices: Collection[slice],
+    absolute: bool = False,
 ):
     """
     Calculates a direction vector based
@@ -252,12 +250,19 @@ def vector_from_slices(
     Args:
         from_slices (Collection[slice]): from Collection of slices.
         to_slices (Collection[slice]): to Collection of slices.
+        absolute (bool): If ```True``` returns absolute values. Default False.
 
     Returns:
         NDArray[numpy.int8]: vector representing direction.
     """
-    # figure out the direction of evaluation
-    # based on supplied slices
+    if absolute:
+        return numpy.asarray(
+            [
+                abs(int(to_slice.start or 0) - int(from_slice.start or 0))
+                for from_slice, to_slice in zip(from_slices, to_slices)
+            ],
+            dtype=numpy.int8,
+        )
     return numpy.asarray(
         [
             int(to_slice.start or 0) - int(from_slice.start or 0)

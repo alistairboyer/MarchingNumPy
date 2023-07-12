@@ -7,6 +7,8 @@ This package is a Python and NumPy implementation of the marching cubes and rela
 
 .. include:: Marching.rst
 
+.. include:: MarchingCuPy.rst
+
 .. toctree::
    :maxdepth: 5
 

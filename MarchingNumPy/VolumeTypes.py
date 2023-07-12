@@ -24,7 +24,7 @@ def volume_types(
     operation such as ``volume_test = volume >= level``)
     in the direction stipulated by each of the :attr:`slices`.
     The function iterates through the collection of :attr:`slices` and
-    :attr:`types` is updated using :func:`numpy.bitwise_or` with the index
+    :attr:`types` is updated with the index
     bit (shifted left every iteration of the loop).
 
     Example :attr:`slices` for standard 3D and 2D volumes (with
@@ -114,7 +114,7 @@ def volume_types(
     # check the biggest type value will fit in the supplied dtype
     if 1 << nDir > numpy.iinfo(types.dtype).max:
         raise TypeError(
-            f"The largest index {(1<<nDir)-1} will not fit into numpy.ndarray with dtype={dtype.__name__}."
+            f"The largest index {(1<<nDir)-1} will not fit into dtype={dtype.__name__}."
         )
 
     # Cool but much slower approach

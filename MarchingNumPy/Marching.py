@@ -18,9 +18,7 @@ def marching_factory(
     nEdges: int,
     intersect_slice_indexes: Collection[Any],
     volume_type_slices: Collection[Tuple[slice, ...]],
-    ambiguity_resolution: Optional[
-        Callable[[NDArray[Any], NDArray[Any]], NDArray["numpy.bool_"]]
-    ] = None,
+    ambiguity_resolution: Optional[Callable[[NDArray, NDArray], None]] = None,
     geometry_array: NDArray[numpy.integer[Any]],
     edge_direction: NDArray[numpy.unsignedinteger[Any]],
     edge_delta: NDArray[numpy.unsignedinteger[Any]],
@@ -157,7 +155,7 @@ def marching_factory(
 
         # resolve ambiguous cases
         if resolve_ambiguous and ambiguity_resolution:
-            ambiguity_resolution(types=types, volume=volume)
+            ambiguity_resolution(types, volume)
 
         # look up geometry according to square type
         geometry: NDArray[numpy.integer]
@@ -169,8 +167,13 @@ def marching_factory(
             size_multiplier=size_multiplier,
         )
 
+        # convert from cupy to numpy for this step
+        # CUPYINCLUDE
+        # geometry, vertex_ids = geometry.get(), vertex_ids.get()
+        # CUPYINCLUDEEND
+
         # convert geometry indexes from edge_ids to ordered id
-        geometry = ConvertIndexes.convert_indexes(geometry, vertex_ids)
+        geometry = ConvertIndexes.convert_indexes(geometry, vertex_ids, method="NUMPY")
 
         return vertices, geometry
 
