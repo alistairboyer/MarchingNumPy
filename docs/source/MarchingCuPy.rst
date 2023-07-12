@@ -9,12 +9,12 @@ MarchingCuPy
    and replacing :attr:`numpy.` array creation routines with their :attr:`cupy.` equivalents. 
 
    Substitutions:
-      - numpy.asarray --> cupy.asarray
-      - numpy.concatenate --> cupy.concatenate
-      - numpy.full_like --> cupy.full_like
-      - numpy.nonzero --> cupy.nonzero
-      - numpy.ones --> cupy.ones
-      - numpy.zeros --> cupy.zeros
+      - numpy.asarray → cupy.asarray
+      - numpy.concatenate → cupy.concatenate
+      - numpy.full_like → cupy.full_like
+      - numpy.nonzero → cupy.nonzero
+      - numpy.ones → cupy.ones
+      - numpy.zeros → cupy.zeros
    
    The majority of operations are methods on array objects so are converted implicitly.
    In other cases the :attr:`cupy.` attribute is an alias for the :attr:`numpy.` attribute.
