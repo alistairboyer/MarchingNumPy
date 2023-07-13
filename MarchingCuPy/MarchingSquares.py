@@ -7,7 +7,6 @@ import cupy
 
 from . import Marching
 from . import IndexingTools
-from . import ResolveAmbiguous
 
 marching_squares: Callable  # See end of file
 """
@@ -56,7 +55,6 @@ INTERSECT_SLICE_INDEXES = [
     IndexingTools.str_to_index_tuple("[:, :-1]", "[:, 1:]"),  # x,y - x,y+1
 ]
 
-
 EDGE_DELTA: NDArray[numpy.uint8]
 EDGE_DELTA = cupy.asarray(
     [
@@ -79,6 +77,7 @@ EDGE_DIRECTION = cupy.asarray(
     dtype=numpy.uint8,
 )
 
+# Edge definitions
 _NONE: List[int] = [-1, -1]
 _BOTTOM_LEFT: List[int] = [0, 3]
 _BOTTOM_RIGHT: List[int] = [1, 0]
@@ -87,6 +86,7 @@ _HORIZONTAL: List[int] = [1, 3]
 _TOP_LEFT: List[int] = [2, 3]
 _TOP_RIGHT: List[int] = [2, 1]
 
+# Geometry lookup table
 """
 Geometry lookup table for marching squares.
 
@@ -95,6 +95,7 @@ Geometry lookup table for marching squares.
 GEOMETRY_LOOKUP: NDArray[numpy.int8]
 GEOMETRY_LOOKUP = cupy.asarray(
     [
+        # default values
         _NONE + _NONE,  # 0
         _BOTTOM_LEFT + _NONE,  # 1
         _BOTTOM_RIGHT + _NONE,  # 2
@@ -111,6 +112,7 @@ GEOMETRY_LOOKUP = cupy.asarray(
         _BOTTOM_RIGHT[::-1] + _NONE,  # 13
         _BOTTOM_LEFT[::-1] + _NONE,  # 14
         _NONE + _NONE,  # 15
+        # flipped values for ambiguous cases
         _TOP_LEFT + _BOTTOM_RIGHT[::-1],  # 5 -> 16
         _TOP_RIGHT[::-1] + _BOTTOM_LEFT[::-1],  # 10 -> 17
     ],
@@ -128,17 +130,6 @@ SQUARE_AMBIGUITY_RESOLUTION = {
 }
 
 
-def ambiguity_resolution(
-    types,
-    volume,
-):
-    ResolveAmbiguous.resolve_ambiguous_types(
-        types,
-        interpolate_face_values(volume)[..., None],
-        SQUARE_AMBIGUITY_RESOLUTION,
-    )
-
-
 def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.bool_]:
     return (
         volume[:-1, :-1][filt] * volume[1:, 1:][filt]
@@ -146,17 +137,18 @@ def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.boo
     )
 
 
-def ambiguity_resolution2(
+def ambiguity_resolution(
     types,
     volume,
-):
+) -> None:
     for ambiguous_type, condition, resolved_type in [
         (5, False, 16),
         (10, True, 17),
     ]:
         filt = cupy.nonzero(types == ambiguous_type)
-        face_test = interpolate_face_values(volume, filt)
-        types[filt][face_test == condition] = resolved_type
+        new_type = types[filt]
+        new_type[condition == interpolate_face_values(volume, filt)] = resolved_type
+        types[filt] = new_type
 
 
 marching_squares = Marching.marching_factory(

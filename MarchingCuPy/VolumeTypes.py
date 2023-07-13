@@ -18,7 +18,7 @@ def volume_types(
     r"""
     Calculate the type of each `unit` of a volume based on the values at each corner.
 
-    The returned numpy array :attr:`types` is initalised to a :func:`numpy.zeros` array
+    The returned numpy array :attr:`types` is initalised to a :func:`cupy.zeros` array
     with shape ``n-1`` for each ``n`` in :attr:`volume_test` shape.
     Then, :attr:`types` is updated depending on the values in :attr:`volume_test`
     (where :attr:`volume_test` is the result of an
@@ -34,6 +34,7 @@ def volume_types(
     to generate these :attr:`slices`.
     ::
 
+        # Standard slices for a 3D volume
         slices = [
             slice(None, -1), slice(None, -1), slice(None, -1), # 1:   x,   y,   z
             slice( 1, None), slice(None, -1), slice(None, -1), # 2:   x+1, y,   z
@@ -45,6 +46,7 @@ def volume_types(
             slice(None, -1), slice( 1, None), slice( 1, None), # 128: x,   y+1, z+1
         ]
 
+        # Standard slices for a 2D volume
         slices = [
             slice(None, -1), slice(None, -1), # 1: x,   y
             slice( 1, None), slice(None, -1), # 2: x+1, y
@@ -92,28 +94,43 @@ def volume_types(
 
     """
 
+    # play with stop = :1 instead of 1: for slicing to get cool visual results!
 
+    # check the arguments
     volume_test = cupy.asarray(volume_test, dtype=numpy.bool_)
+    # number of dimensions in indexing
     nD: int
     nD = int(len(next(iter(slices))))
+    # number of directions to slice in
     nDir: int
     nDir = int(len(slices))
+    # check for at least one value in each dimension
     Checking.assert_nd_array(volume_test, nD, 1)
 
+    # intialise the types array to zero with size n-1 vs volume_test
     n: int  # ruff: noqa: F842
     types: NDArray[Types.VolumeType]
     types = cupy.zeros(tuple(n - 1 for n in volume_test.shape), dtype=dtype)
 
+    # check the biggest type value will fit in the supplied dtype
     if 1 << nDir > numpy.iinfo(types.dtype).max:
         raise TypeError(
             f"The largest index {(1<<nDir)-1} will not fit into dtype={dtype.__name__}."
         )
 
+    # Cool but much slower approach
+    # numpy.lib.stride_tricks.sliding_window_view(volume_test, [2] * nD)
+    # then numpy.packbits ...
 
+    # iterate over the slices
+    # the order determines the bit shift, i, of the resulting test
     i: int
     slice_i: Tuple[slice, ...]
     for i, slice_i in enumerate(slices):
 
+        # update the types with a bitwise_or according to
+        # the index i of this slice
+        # slower alternative that is compatible with cupy
         types[volume_test[slice_i]] |= 1 << i
 
     return types

@@ -63,40 +63,56 @@ def look_up_geometry(
 
     """
 
+    # format the number of directions
     nDir = int(nDir if nDir else 1 + edge_direction.max())
 
+    # number of vertices per geometry, e.g. 3 for triangle
     nV: int = edge_delta.shape[1]
+    # Check the shape of the geometry table is consistent with the dimensions of the geometry
     if not geometry_array.shape[1] % nV == 0:
         raise ValueError("Bad shape of geometry array.")
 
+    # intialise the return value
     geometry: NDArray[numpy.uint64]
     geometry = cupy.zeros((0, nV), dtype=numpy.uint64)
 
+    # get the geometry lookup values from the supplied types
     geometry_lookups: NDArray[numpy.integer[Any]]
     geometry_lookups = geometry_array[types]
 
+    # The edge information in EDGE_DELTA and EDGE_DIRECTION
+    # Can be reduced to a single array once size_multiplier is known
+    # vertex_id_offset_lookup = numpy.dot(edge_delta, size_multiplier) + edge_direction
     vertex_id_offset_lookup = (edge_delta * size_multiplier).sum(
         axis=-1
     ) + edge_direction
 
+    # consider each set of vertices from the look up table
     i: int
     for i in range(0, geometry_array.shape[-1], nV):
 
+        # filter the geometry indexes for -1 [null / no geometry]
         geometry_lookups_filter = cupy.nonzero(geometry_lookups[..., i] != -1)
 
+        # if there are no nore matches then there are no more geometry to be found
         if geometry_lookups_filter[0].size == 0:
             break
 
+        # fetch the set of nV edge numbers from the geometry information
         geometry_type_column = geometry_lookups[geometry_lookups_filter][
             ..., i : i + nV
         ].astype(numpy.int16)
 
+        # get the corner coordinates from the filter tuple
+        # convert to corner_ids by taking dot product with size_multiplier
         corner_ids = (cupy.asarray(geometry_lookups_filter, dtype="uint64").transpose() * size_multiplier).sum(axis=-1)
 
+        # add the corner_ids to the looked up vertex_id_offset to get the vertex ids
         geometry_vertex_ids = (
             corner_ids[..., None] + vertex_id_offset_lookup[geometry_type_column]
         )
 
+        # extend the geometry by the current vertex_ids
         geometry = cupy.concatenate((geometry, geometry_vertex_ids), axis=0)
 
     return geometry

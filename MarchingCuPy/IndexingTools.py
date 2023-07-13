@@ -119,15 +119,21 @@ def str_to_index(string: str) -> Any:
         if ":" in the input then it will be converted to a slice.
 
     """
+    # Square brackets are optional
     string = string.replace("[", "").replace("]", "")
+    # Single index
     try:
         return int(string)
     except Exception:
         pass
+    # Multidimensional slices for e.g. NumPy have a "," in the slice
     if "," in string:
+        # One level of recursion [all "," are removed by split]
         return tuple(map(str_to_index, string.split(",")))
+    # Return Ellipsis for Ellipsis
     if "..." in string or "Ellipsis" in string:
         return Ellipsis
+    # Single dimensional slice
     if ":" in string:
         return slice(*map(int_or_none, string.split(":")))
 
@@ -143,12 +149,15 @@ def str_to_index_tuple(*string: str) -> Any:
 
 
 def _test_examples() -> None:
+    # test examples in docstrings
 
+    # int_or_none
     assert int_or_none("3") == 3
     assert int_or_none(3.2) == 3
     assert int_or_none("3.2") is None
     assert int_or_none("") is None
 
+    # str_to_index
     assert str_to_index("1") == 1
     assert str_to_index("[-1]") == -1
     assert str_to_index("[1:]") == slice(1, None, None)

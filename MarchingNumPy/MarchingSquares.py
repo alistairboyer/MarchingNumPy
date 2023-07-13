@@ -145,8 +145,9 @@ def ambiguity_resolution(
         (10, True, 17),
     ]:
         filt = numpy.nonzero(types == ambiguous_type)
-        face_test = interpolate_face_values(volume, filt)
-        types[filt][face_test == condition] = resolved_type
+        new_type = types[filt]
+        new_type[condition == interpolate_face_values(volume, filt)] = resolved_type
+        types[filt] = new_type
 
 
 marching_squares = Marching.marching_factory(

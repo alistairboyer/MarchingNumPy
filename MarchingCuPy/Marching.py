@@ -19,9 +19,7 @@ def marching_factory(
     nEdges: int,
     intersect_slice_indexes: Collection[Any],
     volume_type_slices: Collection[Tuple[slice, ...]],
-    ambiguity_resolution: Optional[
-        Callable[[NDArray[Any], NDArray[Any]], NDArray["numpy.bool_"]]
-    ] = None,
+    ambiguity_resolution: Optional[Callable[[NDArray, NDArray], None]] = None,
     geometry_array: NDArray[numpy.integer[Any]],
     edge_direction: NDArray[numpy.unsignedinteger[Any]],
     edge_delta: NDArray[numpy.unsignedinteger[Any]],
@@ -108,22 +106,29 @@ def marching_factory(
         to include more specific information.
         """
 
+        # check input
         volume = cupy.asarray(volume, dtype=Types.Volume)
         level = cupy.asarray(level, dtype=Types.Volume)
         interpolation = str(interpolation).upper()  # passed to find_intersects
         step_size = int(step_size)
         resolve_ambiguous = bool(resolve_ambiguous)
 
+        # if step_size is more than one then resample the volume
         if step_size > 1:
             volume = volume[tuple([slice(None, None, step_size)] * nD)]
 
+        # check there are at least 2 values in each dimension
         Checking.assert_nd_array(volume, nD, 2)
 
+        # Zero the volume against the level and test the volume
         if level.any():
             volume = volume - level
         volume_test: NDArray[Types.VolumeTest]
         volume_test = (volume >= 0).astype(Types.VolumeTest)
 
+        # Calculate the size multplier for edge_ids
+        # this is the cumulative product of the maximum value in each axis
+        # multiplied by the number of edges
         size_multiplier: NDArray[Types.SizeMultiplier]
         size_multiplier = cupy.ones(nD, dtype=Types.SizeMultiplier)
         size_multiplier[: (nD - 1)] = cupy.asarray(volume.shape)[::-1].cumprod()[::-1][
@@ -131,6 +136,7 @@ def marching_factory(
         ]
         size_multiplier *= nEdges
 
+        # Find all vertices where the values cross the zero threshold
         vertices: NDArray[Types.Intersect]
         vertex_ids: NDArray[Types.Intersect_id]
         vertices, vertex_ids = FindIntersects.find_intersects(
@@ -141,15 +147,18 @@ def marching_factory(
             interpolation=interpolation,
         )
 
+        # calculate the type of each volume unit according to the value in each corner (given by the slices)
         types: NDArray[Types.VolumeType]
         types = VolumeTypes.volume_types(
             volume_test=volume_test,
             slices=volume_type_slices,
         )
 
+        # resolve ambiguous cases
         if resolve_ambiguous and ambiguity_resolution:
             ambiguity_resolution(types, volume)
 
+        # look up geometry according to square type
         geometry: NDArray[numpy.integer]
         geometry = LookUpGeometry.look_up_geometry(
             types=types,
@@ -159,9 +168,11 @@ def marching_factory(
             size_multiplier=size_multiplier,
         )
 
-        
+        # convert from cupy to numpy for this step
         geometry, vertex_ids = geometry.get(), vertex_ids.get()
 
+        # convert geometry indexes from edge_ids to ordered id
+        geometry = ConvertIndexes.convert_indexes(geometry, vertex_ids, method="NUMPY")
 
         return vertices, geometry
 

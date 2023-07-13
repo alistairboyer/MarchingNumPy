@@ -115,6 +115,7 @@ def find_intersects(
 
     """
 
+    # check the arguments
     volume = cupy.asarray(volume)
     if not volume.size > 0:
         raise ValueError("There must be at least one value is each supplied dimension.")
@@ -134,6 +135,7 @@ def find_intersects(
 
     nD: int = volume.ndim  # number of dimensions
 
+    # initialise intersects and their ids
     intersects: NDArray[Intersect]
     intersects = cupy.zeros((0, nD), dtype=Intersect)
     intersect_ids: NDArray[Intersect_id]
@@ -144,34 +146,47 @@ def find_intersects(
     nplus1_slices: Tuple[slice, ...]
     for i, (n_slices, nplus1_slices) in enumerate(slice_indexes):
 
-        value_filter: Tuple[NDArray[numpy.int64], ...]  # Type from numpy.nonzero
-        value_filter = cupy.nonzero(volume_test[n_slices] != volume_test[nplus1_slices])
+        # compare each volume_test value with the next value along the vector
+        value_filter: Tuple[NDArray[numpy.int64], ...]  # Type from cupy.nonzero
+        value_filter = cupy.nonzero(
+            volume_test[n_slices] != volume_test[nplus1_slices]
+        )
 
+        # convert the filter into indices where there are crossing points
         intersect_indices: NDArray[Intersect_id]
         intersect_indices = cupy.asarray(value_filter, dtype=Intersect_id).transpose()
 
+        # initialise the intersects to the corner of the cube
         intersects_along_axis: NDArray[Intersect]
         intersects_along_axis = intersect_indices.astype(Intersect)
 
+        # if there are no intersects we can continue
         if intersects_along_axis.size == 0:
             continue
 
+        # do the interpolation
+        # TODO: Transfer interpolation  to indvidual functions
+        # TODO: Cubic interpolation - more challenging because need nminus1 and nplus2 values
         interpolated_offset: NDArray[Intersect]
         if interpolation == "HALFWAY":
+            # assign the crossing point half way along the edge
             interpolated_offset = cupy.asarray(0.5, dtype=Intersect)
 
         else:
+            # Get the volume values for interpolation
             n_values: NDArray[Any]
             nplus1_values: NDArray[Any]
             n_values = volume[n_slices][value_filter]
             nplus1_values = volume[nplus1_slices][value_filter]
 
             if interpolation == "LINEAR":
+                # linear interpolate the distance along the axis of the crossing point
                 interpolated_offset = (n_values / (n_values - nplus1_values)).astype(
                     Intersect
                 )
 
             if interpolation == "COSINE":
+                # cosine interpolate the distance along the axis of the crossing point
                 interpolated_offset = (
                     cupy.arccos(
                         (nplus1_values + n_values) / (nplus1_values - n_values)
@@ -179,9 +194,12 @@ def find_intersects(
                     / numpy.pi
                 ).astype(Intersect)
 
+        # calculate a vector based upon the slice directions
         slice_vector: NDArray[numpy.integer[Any]]
         slice_vector = vector_from_slices(n_slices, nplus1_slices, absolute=True)
 
+        # fill out the interpolated value
+        # double transpose for broadcasting!
         interpolated_offset = (
             interpolated_offset
             * cupy.full_like(
@@ -190,16 +208,25 @@ def find_intersects(
                 dtype=Intersect,
             ).transpose()
         ).transpose()
+        # numpy.einsum is tidier but a little slower and horroble for cupy
+        # numpy.einsum("i,j->ij", interpolated_offset, slice_vector)
 
+        # add the appropriate amount according to interpolation
         intersects_along_axis += interpolated_offset
 
+        # add any results to the complete list
+        # extend the list of intersects with the ones from this axis
         intersects = cupy.concatenate((intersects, intersects_along_axis), axis=0)
 
+        # convert the intersect_indices into intersect_ids and append to list
         intersect_ids = cupy.concatenate(
             (intersect_ids, (intersect_indices * size_multiplier).sum(axis=1) + i),
+            # (intersect_ids, numpy.dot(intersect_indices, size_multiplier) + i),
             axis=0,
         )
 
+        # einsum is faster than equivalent .sum(axis=1)
+        # multiply and .sum is faster than numpy.dot
 
     return intersects, intersect_ids
 
@@ -216,7 +243,7 @@ def vector_from_slices(
     Args:
         from_slices (Collection[slice]): from Collection of slices.
         to_slices (Collection[slice]): to Collection of slices.
-        absolute (bool): If True returns absolute values. Default False.
+        absolute (bool): If ```True``` returns absolute values. Default False.
 
     Returns:
         NDArray[numpy.int8]: vector representing direction.

@@ -116,9 +116,11 @@ EDGE_DIRECTION = cupy.asarray(
 )
 
 
+# Geometry look up tables
 
 _NONE: List[int] = [-1, -1]
 
+# Squares split like : /
 
 _TOP_HORIZONTAL: List[int] = [4, 3]
 _TOP_VERTICAL: List[int] = [2, 4]
@@ -170,11 +172,14 @@ GEOMETRY_LOOKUP_BOTTOM: NDArray[numpy.int8] = cupy.asarray(
     ],
     dtype=numpy.int8,
 )
+# create lookup table by combining top and bottom triangles
 GEOMETRY_LOOKUP: NDArray[numpy.int8]
 GEOMETRY_LOOKUP = cupy.zeros((16, 4), dtype=numpy.int8)
 GEOMETRY_LOOKUP[:, :2] = GEOMETRY_LOOKUP_TOP
 GEOMETRY_LOOKUP[:, 2:] = GEOMETRY_LOOKUP_BOTTOM
 
+# Squares split like : \
+# variable names with "_" suffix
 
 _TOP_CORNER_: List[int] = [2, 1]
 _TOP_HORIZONTAL_: List[int] = [1, 4]
@@ -227,6 +232,7 @@ GEOMETRY_LOOKUP_BOTTOM_: NDArray[numpy.int8] = cupy.asarray(
     dtype=numpy.int8,
 )
 
+# create lookup table by combining top and bottom triangles
 GEOMETRY_LOOKUP_REVERSED: NDArray[numpy.int8]
 GEOMETRY_LOOKUP_REVERSED = cupy.zeros((16, 4), dtype=numpy.int8)
 GEOMETRY_LOOKUP_REVERSED[:, :2] = GEOMETRY_LOOKUP_TOP_

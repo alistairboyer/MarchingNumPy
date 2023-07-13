@@ -23,6 +23,6 @@ MarchingCuPy
 
    Operational differences:
       - cupy does not support the ``where=`` keyword argument in methods so an alternative is used
-      - :meth:`cupy.einsum` is exceptionally slow so an alternative is used
+      - :meth:`cupy.einsum` is exceptionally slow so an alternative is used (also :meth:`cupy.dot`)
    
 
