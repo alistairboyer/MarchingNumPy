@@ -4,6 +4,7 @@ backup/
 development/
 videos/*
 !videos/Video01/
+!videos/Video02/
 CuPyConvert.py
 quicktest.py
 
