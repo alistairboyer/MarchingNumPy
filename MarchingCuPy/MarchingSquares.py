@@ -101,7 +101,7 @@ GEOMETRY_LOOKUP = cupy.asarray(
         _BOTTOM_RIGHT + _NONE,  # 2
         _HORIZONTAL + _NONE,  # 3
         _TOP_RIGHT + _NONE,  # 4
-        _TOP_RIGHT + _BOTTOM_LEFT,  # 5
+        _TOP_LEFT + _BOTTOM_RIGHT[::-1],  # 5
         _VERTICAL + _NONE,  # 6
         _TOP_LEFT + _NONE,  # 7
         _TOP_LEFT[::-1] + _NONE,  # 8
@@ -113,21 +113,14 @@ GEOMETRY_LOOKUP = cupy.asarray(
         _BOTTOM_LEFT[::-1] + _NONE,  # 14
         _NONE + _NONE,  # 15
         # flipped values for ambiguous cases
-        _TOP_LEFT + _BOTTOM_RIGHT[::-1],  # 5 -> 16
+        _TOP_RIGHT + _BOTTOM_LEFT,  # 5 -> 16
         _TOP_RIGHT[::-1] + _BOTTOM_LEFT[::-1],  # 10 -> 17
     ],
     dtype=numpy.int8,
 )
 
-SQUARE_AMBIGUITY_RESOLUTION: Dict[int, List[Any]]
-SQUARE_AMBIGUITY_RESOLUTION = {
-    5: [
-        [False, True, 16],
-    ],
-    10: [
-        [True, True, 17],
-    ],
-}
+SQUARE_AMBIGUITY_RESOLUTION: Dict[int, int]
+SQUARE_AMBIGUITY_RESOLUTION = {5: 16, 10: 17}
 
 
 def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.bool_]:
@@ -138,16 +131,13 @@ def interpolate_face_values(volume: NDArray[Any], filt=...) -> NDArray[numpy.boo
 
 
 def ambiguity_resolution(
-    types,
-    volume,
+    types: NDArray[Any],
+    volume: NDArray[Any],
 ) -> None:
-    for ambiguous_type, condition, resolved_type in [
-        (5, False, 16),
-        (10, True, 17),
-    ]:
+    for ambiguous_type, resolved_type in SQUARE_AMBIGUITY_RESOLUTION.items():
         filt = cupy.nonzero(types == ambiguous_type)
         new_type = types[filt]
-        new_type[condition == interpolate_face_values(volume, filt)] = resolved_type
+        new_type[interpolate_face_values(volume, filt)] = resolved_type
         types[filt] = new_type
 
 
