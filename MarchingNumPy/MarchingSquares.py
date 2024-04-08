@@ -140,6 +140,17 @@ def ambiguity_resolution(
         types[filt] = new_type
 
 
+# Code to match skimage.measure.find_contours
+FIND_CONTOURS_FULLY_CONNECTED_HIGH: NDArray[numpy.int8]
+FIND_CONTOURS_FULLY_CONNECTED_HIGH = GEOMETRY_LOOKUP[:16]
+FIND_CONTOURS_FULLY_CONNECTED_HIGH[10] = GEOMETRY_LOOKUP[17]
+
+FIND_CONTOURS_FULLY_CONNECTED_LOW: NDArray[numpy.int8]
+FIND_CONTOURS_FULLY_CONNECTED_LOW = GEOMETRY_LOOKUP[:16]
+FIND_CONTOURS_FULLY_CONNECTED_LOW[5] = GEOMETRY_LOOKUP[16]
+
+
+
 marching_squares = Marching.marching_factory(
     nD=2,
     nEdges=2,
